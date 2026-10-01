@@ -1,0 +1,39 @@
+# One file = one version of one DISCOM tariff, dated by its effective period (P10, P20).
+# A new tariff order is a new file with new dates, never a code change.
+id: bihar-hts-industrial
+name: Bihar HT industrial
+state: Bihar
+discom: NBPDCL / SBPDCL
+effective_from: 2026-04-01
+effective_to: 2027-03-31
+status: illustrative
+source: "Bihar ToD tariff from April 2026 (ETV Bharat), as cited in the Challenge 4 deep dive"
+notes: >
+  The ToD multipliers (120% in the evening peak, 80% in solar hours) follow the Bihar
+  FY2026-27 industrial ToD. The band windows, energy rate, demand rate, PF slabs and duty
+  are placeholders for the prototype: verify every value against the current BERC tariff
+  order before quoting a rupee figure to a factory.
+
+energy_basis: kWh          # kWh or kVAh. Several northern DISCOMs bill industry in kVAh.
+energy_rate: 8.00          # Rs per unit, before ToD multiplier
+
+tod:
+  default_band: normal
+  default_multiplier: 1.00
+  bands:
+    - {name: solar, start: "09:00", end: "17:00", multiplier: 0.80}
+    - {name: peak, start: "17:00", end: "23:00", multiplier: 1.20}
+
+demand:
+  rate_per_kva_month: 450
+  billing_floor_pct_of_contract: 75   # billed on the higher of actual MD or this share of contract demand
+  excess_surcharge_pct: 50            # demand above contract demand billed at 150% of the rate
+
+power_factor:
+  reference: 0.90
+  penalty_pct_per_0_01: 1.0           # % of energy charges per 0.01 below reference
+  incentive_threshold: 0.95
+  incentive_pct_per_0_01: 0.5         # % rebate on energy charges per 0.01 above threshold
+
+electricity_duty_pct: 6.0
+fixed_charges_per_month: 0

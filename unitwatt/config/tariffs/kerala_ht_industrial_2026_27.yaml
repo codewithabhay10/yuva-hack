@@ -1,0 +1,36 @@
+id: kerala-ht-industrial
+name: Kerala HT-I industrial
+state: Kerala
+discom: KSEB
+effective_from: 2026-04-01
+effective_to: 2027-03-31
+status: illustrative
+source: "KSEB HT tariff: billing demand and PF slabs, as cited in the Challenge 4 deep dive"
+notes: >
+  The billing-demand rule (75% of contract demand) and the 50% surcharge on excess demand
+  follow the KSEB HT tariff. ToD windows, rates and PF slabs are placeholders: verify them
+  against the current KSERC tariff order.
+
+energy_basis: kWh
+energy_rate: 6.80
+
+tod:
+  default_band: normal
+  default_multiplier: 1.00
+  bands:
+    - {name: peak, start: "18:00", end: "22:00", multiplier: 1.20}
+    - {name: off-peak, start: "22:00", end: "06:00", multiplier: 0.90}
+
+demand:
+  rate_per_kva_month: 500
+  billing_floor_pct_of_contract: 75
+  excess_surcharge_pct: 50
+
+power_factor:
+  reference: 0.90
+  penalty_pct_per_0_01: 1.0
+  incentive_threshold: 0.95
+  incentive_pct_per_0_01: 0.25
+
+electricity_duty_pct: 10.0
+fixed_charges_per_month: 0

@@ -1,0 +1,32 @@
+# Sector template (P20): a new cluster means a new template, not a new product.
+sector: forging
+label: Forging
+label_hi: फोर्जिंग
+
+# Plant-level electricity per tonne of forged output: the cluster benchmark (P13).
+benchmarks:
+  status: illustrative
+  source: "Placeholder ranges: replace with the BEE energy mapping study values for the cluster"
+  electricity_sec_kwh_per_t:
+    good: 420
+    typical: 540
+    poor: 680
+
+# Marginal electricity per extra tonne, the regression prior when a unit has few days of data.
+marginal_sec_prior_kwh_per_t: 450
+
+default_shift_window: {start: "07:00", end: "23:00"}
+
+# Loads that can usually move to cheaper hours, and the ones that usually cannot.
+shiftable_loads: [induction billet heating, forging press batches, shot blasting, compressed-air receiver charging]
+fixed_loads: [machining, lighting, cooling tower, office]
+
+# CBAM (EU carbon border adjustment). For iron and steel only direct emissions (plus
+# precursors) are priced; electricity emissions are reported for buyers' Scope 3 requests.
+cbam:
+  covered_hsn_prefixes: ["72", "7301", "7302", "7303", "7304", "7305", "7306", "7307", "7308",
+                         "7309", "7310", "7311", "7318", "7326"]
+  category: Iron and steel
+  priced_scopes: [direct, precursor]
+  default_value_markup_pct: {2026: 10, 2027: 20, 2028: 30}
+  source: "CBAM Annex I iron and steel CN headings; check against the current Annex before filing"

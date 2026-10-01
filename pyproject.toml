@@ -1,0 +1,9 @@
+[project]
+name = "unitwatt"
+version = "0.1.0"
+description = "Software-only energy and carbon ledger for Indian MSME factories"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

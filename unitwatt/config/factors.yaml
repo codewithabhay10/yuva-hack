@@ -1,0 +1,62 @@
+# Conversion and emission factors (P5, P16).
+# Every factor carries its source so every report can show where a number came from.
+# Users can override any fuel factor with their supplier's test certificate.
+
+electricity:
+  mj_per_kwh: 3.6
+
+grid:
+  emission_factor_tco2_per_mwh: 0.675
+  source: "CEA CO2 Baseline Database v22.0, FY2025-26 grid emission factor"
+
+fuels:
+  diesel:
+    label: Diesel (HSD)
+    unit: litre
+    density_kg_per_unit: 0.832
+    ncv_mj_per_kg: 43.0
+    co2_kg_per_tj: 74100
+    source: "IPCC 2006 Guidelines, Vol. 2, Tables 1.2 and 1.4 (gas/diesel oil); typical density"
+  furnace_oil:
+    label: Furnace oil
+    unit: litre
+    density_kg_per_unit: 0.95
+    ncv_mj_per_kg: 40.4
+    co2_kg_per_tj: 77400
+    source: "IPCC 2006 Guidelines, Vol. 2, Tables 1.2 and 1.4 (residual fuel oil); typical density"
+  coal:
+    label: Coal (sub-bituminous)
+    unit: kg
+    density_kg_per_unit: 1.0
+    ncv_mj_per_kg: 18.9
+    co2_kg_per_tj: 96100
+    source: "IPCC 2006 defaults (sub-bituminous coal). Indian coals vary widely: use the supplier's test certificate"
+  pet_coke:
+    label: Petroleum coke
+    unit: kg
+    density_kg_per_unit: 1.0
+    ncv_mj_per_kg: 32.5
+    co2_kg_per_tj: 97500
+    source: "IPCC 2006 defaults (petroleum coke)"
+  natural_gas:
+    label: Natural gas (PNG)
+    unit: scm
+    density_kg_per_unit: 0.75
+    ncv_mj_per_kg: 48.0
+    co2_kg_per_tj: 56100
+    source: "IPCC 2006 defaults (natural gas); density approximate, use the gas supplier's GCV statement"
+  lpg:
+    label: LPG
+    unit: kg
+    density_kg_per_unit: 1.0
+    ncv_mj_per_kg: 47.3
+    co2_kg_per_tj: 63100
+    source: "IPCC 2006 defaults (LPG)"
+  firewood:
+    label: Firewood
+    unit: kg
+    density_kg_per_unit: 1.0
+    ncv_mj_per_kg: 15.6
+    co2_kg_per_tj: 112000
+    biogenic: true
+    source: "IPCC 2006 defaults (wood). Biogenic CO2 is reported as a memo item, not in Scope 1"

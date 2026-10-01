@@ -1,0 +1,73 @@
+# Factory profile, filled in at onboarding with a short guided form.
+# This one describes the SYNTHETIC demo unit used until a real factory shares its bills.
+id: demo-forge
+name: Shakti Forge Works (synthetic demo unit)
+city: Patna
+state: Bihar
+sector: forging
+tariff_id: bihar-hts-industrial
+consumer_number: SYN-BR-000123
+contract_demand_kva: 300
+owner_name: Ramesh
+language: hi
+workers: 48
+
+shift_window: {start: "07:00", end: "23:00"}
+working_weekdays: [0, 1, 2, 3, 4, 5]   # Monday to Saturday
+essential_night_load_kw: 3.0           # security lights, server, guard room
+
+products:
+  - id: flange
+    name: Forged flanges
+    name_hi: फ्लेंज
+    hsn: "73079190"
+    heat_treated: true
+    aliases: [flange, flanges, फ्लेंज]
+  - id: crank
+    name: Crankshaft blanks
+    name_hi: क्रैंकशाफ्ट ब्लैंक
+    hsn: "84831099"
+    heat_treated: false
+    aliases: [crank, crankshaft, cranks, क्रैंक, क्रैंकशाफ्ट]
+  - id: gear
+    name: Gear blanks
+    name_hi: गियर ब्लैंक
+    hsn: "73261990"
+    heat_treated: true
+    aliases: [gear, gears, गियर]
+
+# Purchased steel billets are a CBAM precursor.
+precursor:
+  material: Steel billets
+  yield_t_input_per_t_output: 1.15
+  tco2_per_t: 2.3
+  source: "ILLUSTRATIVE: replace with the supplier's declared embedded emissions or the EU default value"
+
+machines:
+  - {id: induction_heater, name: Induction billet heater, rated_kw: 160, shiftable: true}
+  - {id: forging_press, name: Forging press line, rated_kw: 60, shiftable: true}
+  - {id: shot_blaster, name: Shot blasting machine, rated_kw: 40, shiftable: true}
+  - {id: compressor, name: Screw air compressor, rated_kw: 30, shiftable: false}
+  - {id: machining, name: CNC and machining cells, rated_kw: 35, shiftable: false}
+  - {id: ht_furnace, name: Heat-treatment furnace (furnace oil fired), rated_kw: 5, shiftable: false}
+  - {id: dg_set, name: Diesel generator 125 kVA, rated_kw: 100, shiftable: false}
+
+# A typical production day, used by the scheduler (P12).
+# current_start is how the floor runs it today, taken from the supervisor at onboarding.
+schedule_day:
+  assumed_pf: 0.95
+  hard_limits: {earliest: "07:00", latest_end: "23:00"}   # the owner's limits on shift times
+  base_loads:
+    - {name: Idle and essential load, kw: 7, start: "00:00", end: "24:00"}
+    - {name: Machining, lighting and cooling, kw: 42, start: "07:00", end: "23:00"}
+  jobs:
+    - {id: heat1, name: Billet heating 1, machine: induction_heater, kw: 140, hours: 1.5, current_start: "07:00"}
+    - {id: heat2, name: Billet heating 2, machine: induction_heater, kw: 140, hours: 1.5, current_start: "11:00"}
+    - {id: heat3, name: Billet heating 3, machine: induction_heater, kw: 140, hours: 1.5, current_start: "15:00"}
+    - {id: heat4, name: Billet heating 4, machine: induction_heater, kw: 140, hours: 1.5, current_start: "19:00"}
+    - {id: forge1, name: Forging 1, machine: forging_press, kw: 55, hours: 1.5, after: heat1, max_gap_hours: 1.0, reheat_kw: 40, current_start: "08:30"}
+    - {id: forge2, name: Forging 2, machine: forging_press, kw: 55, hours: 1.5, after: heat2, max_gap_hours: 1.0, reheat_kw: 40, current_start: "12:30"}
+    - {id: forge3, name: Forging 3, machine: forging_press, kw: 55, hours: 1.5, after: heat3, max_gap_hours: 1.0, reheat_kw: 40, current_start: "16:30"}
+    - {id: forge4, name: Forging 4, machine: forging_press, kw: 55, hours: 1.5, after: heat4, max_gap_hours: 1.0, reheat_kw: 40, current_start: "20:30"}
+    - {id: blast1, name: Shot blasting 1, machine: shot_blaster, kw: 40, hours: 2.0, current_start: "17:30"}
+    - {id: blast2, name: Shot blasting 2, machine: shot_blaster, kw: 40, hours: 2.0, current_start: "20:00"}

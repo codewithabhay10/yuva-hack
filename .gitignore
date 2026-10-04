@@ -5,3 +5,4 @@ __pycache__/
 /data/generated/
 *.sqlite
 .streamlit/secrets.toml
+.env

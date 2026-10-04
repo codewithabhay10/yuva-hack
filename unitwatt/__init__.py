@@ -5,4 +5,8 @@ fuel purchases and production registers) into energy per unit of product, a tari
 schedule, audit-ready proof of savings and product-level embedded emissions.
 """
 
+from dotenv import load_dotenv
+
+load_dotenv()  # reads .env in the project root (if present) into os.environ
+
 __version__ = "0.1.0"

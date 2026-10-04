@@ -33,13 +33,39 @@ pip install -r requirements.txt
 
 streamlit run app.py          # the dashboard
 python -m unitwatt            # the same pipeline from the command line; writes reports to data/generated/
-pytest                        # 50 tests
+pytest                        # 67 tests
+python -m unitwatt.extract_eval   # score bill reading against the sample bills, field by field
 ```
 
-Photo and PDF bill reading uses Claude's vision with structured output and is optional: set
-`ANTHROPIC_API_KEY` to turn it on. Everything else runs offline. `data/sample_bills/` has a
-specimen HT bill (PDF, scan and phone photo) with its ground-truth JSON for testing it; the
-specimen is fictional and watermarked, not real factory data.
+Everything runs offline and free. No paid API is needed anywhere.
+
+### Reading bill photos and PDFs (free)
+
+| Reader | Needs | Good for |
+|---|---|---|
+| **Offline** (default) | Nothing | The PDF's own text layer, or RapidOCR for scans and phone photos, then a parser that finds each field by the labels DISCOM bills print. The bill never leaves the computer. |
+| **Google Gemini, free tier** | `GEMINI_API_KEY` from [aistudio.google.com](https://aistudio.google.com/apikey), no card | Unfamiliar layouts and handwritten registers. Google may use free-tier uploads to improve its models, so send it specimen bills, or real ones only with the owner's consent. |
+| Groq or OpenRouter free models | `GROQ_API_KEY` or `OPENROUTER_API_KEY` | The same, as alternatives |
+| Ollama on your own machine | `UNITWATT_READER=ollama` and a vision model (`ollama pull qwen2.5vl:7b`) | Free and private, if the laptop can run it |
+
+The online readers use the OpenAI-compatible chat API, so any similar endpoint works through
+`UNITWATT_BASE_URL`, `UNITWATT_MODEL` and `UNITWATT_API_KEY`. `UNITWATT_READER` picks the
+reader; by default it is the first free API with a key set, and otherwise offline. Free model
+names change often: if a preset model is retired, set `UNITWATT_MODEL`.
+
+Whatever the reader, every bill goes through the arithmetic checks and a confirmation screen
+before it reaches the ledger.
+
+**Tested:** the offline reader read all 21 specimen bills correctly: six months of the demo
+bill, each as a PDF, a clean scan and a phone photo, plus a second layout. The photos include
+angled, noisy, low-resolution and sideways shots. Every number on every bill was exact, and the
+only misreads were spaces and an I/1 in the printed tariff-category text. The online readers are
+tested against a local stand-in for the API (request format, the JSON retry, rate-limit and key
+errors), but have not yet been run against Gemini itself. To do that, set `GEMINI_API_KEY` and
+run `python -m unitwatt.extract_eval --reader gemini`.
+
+`data/sample_bills/` has the specimen bills and the ground-truth JSON for each. They are
+fictional and watermarked, not real factory data.
 
 ## The demo factory
 
@@ -72,7 +98,7 @@ The result is deliberately honest: zero-capex actions get this unit to **6.6%, s
 | Tab | For | What it shows |
 |---|---|---|
 | Owner | Owner | Money that could have been kept this month, top three actions, the WhatsApp message in English or Hindi |
-| Bill check | Owner, accountant | The ten-minute bill check, contract-demand sizing, bill entry with arithmetic checks and confirmation |
+| Bill check | Owner, accountant | The ten-minute bill check, contract-demand sizing, bill photo/PDF reading (offline or a free API) with arithmetic checks and confirmation |
 | Energy per product | Supervisor, auditor | Regression SEC with 90% intervals, 15-minute load heatmap, idle-waste analysis |
 | Schedule | Supervisor | CP-SAT schedule against today's schedule and a naive shift, with the owner's shift limits and a peak cap |
 | Savings proof | Banker, auditor, scheme officer | IPMVP Option C savings, ASHRAE 14 uncertainty, ADEETIE test, consent-gated report download |
@@ -85,8 +111,8 @@ The result is deliberately honest: zero-capex actions get this unit to **6.6%, s
 
 | Problem | Module | Approach |
 |---|---|---|
-| P1 Bills in many layouts | `schemas.py`, `extract.py` | Fixed Pydantic schema; Claude vision fills it; zone-sum, kVAh ≥ kWh and line-item checks; confirmation screen |
-| P2 Handwritten registers | `ingest.parse_daily_entry`, `extract.extract_register` | 30-second chat entry (Hindi, English, Devanagari digits, kg/quintal); register photo extraction |
+| P1 Bills in many layouts | `schemas.py`, `offline_extract.py`, `extract.py` | Fixed Pydantic schema; filled offline (PDF text or OCR plus label rules) or by a free vision model; zone-sum, kVAh ≥ kWh and line-item checks; confirmation screen |
+| P2 Handwritten registers | `ingest.parse_daily_entry`, `extract.extract_register` | 30-second chat entry (Hindi, English, Devanagari digits, kg/quintal); register photos through a free vision model |
 | P3 Meter CSV formats | `ingest.read_load_survey` | One adapter per format into a standard 15-minute series; gaps flagged, never silently filled |
 | P4 Purchases ≠ consumption | `ingest.fuel_consumption` | Opening + purchases − closing, diesel reconciled with the generator log |
 | P5 Incompatible units | `config/factors.yaml` | Everything to MJ and kWh-eq; every factor carries its source; supplier overrides |

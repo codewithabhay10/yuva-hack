@@ -38,10 +38,10 @@
 <text class="t1" x="28" y="82">Electricity bills</text>
 <text class="t2" x="28" y="100">PDF · photo · JSON, monthly</text>
 <rect class="bx " x="236" y="60" width="212" height="72" rx="6"/>
-<text class="t1" x="248" y="82">Bill schema + checks</text>
-<text class="t2" x="248" y="100">zones · kVAh ≥ kWh · total</text>
+<text class="t1" x="248" y="82">Bill reader + checks</text>
+<text class="t2" x="248" y="100">offline OCR · sum checks</text>
 <rect class="pill" x="246" y="106" width="192" height="18" rx="9"/>
-<text class="pt" x="342.0" y="119" text-anchor="middle">Claude vision (optional)</text>
+<text class="pt" x="342.0" y="119" text-anchor="middle">Gemini free (optional)</text>
 <polyline class="ar" points="188,96 234,96" marker-end="url(#ah)"/>
 <polyline class="ar" points="448,84 566,84" marker-end="url(#ah)"/>
 <text class="al" x="458" y="78" text-anchor="start">zone kWh, MD, ₹</text>
@@ -61,7 +61,7 @@
 <text class="t1" x="248" y="266">Register + chat parser</text>
 <text class="t2" x="248" y="284">Hindi · English · kg/quintal</text>
 <rect class="pill" x="246" y="290" width="192" height="18" rx="9"/>
-<text class="pt" x="342.0" y="303" text-anchor="middle">photo via Claude (optional)</text>
+<text class="pt" x="342.0" y="303" text-anchor="middle">photo via Gemini (optional)</text>
 <polyline class="ar" points="188,280 234,280" marker-end="url(#ah)"/>
 <polyline class="ar" points="448,268 566,268" marker-end="url(#ah)"/>
 <text class="al" x="458" y="262" text-anchor="start">t / product / day</text>

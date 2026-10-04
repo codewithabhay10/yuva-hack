@@ -5,7 +5,6 @@ Run with:  streamlit run app.py
 
 from __future__ import annotations
 
-import os
 import re
 from dataclasses import replace
 from datetime import datetime, timedelta
@@ -247,7 +246,7 @@ with tabs[1]:
 
     st.markdown("#### Add a bill (P1)")
     st.caption("Every bill passes arithmetic checks and a confirmation screen before it reaches the ledger.")
-    source = st.radio("Source", ["Edit a bill on record", "Upload bill JSON", "Upload bill photo or PDF (Claude)"], horizontal=True)
+    source = st.radio("Source", ["Edit a bill on record", "Upload bill JSON", "Upload bill photo or PDF"], horizontal=True)
     draft: BillDocument | None = None
     if source == "Edit a bill on record":
         pick = st.selectbox("Bill", [f"{b.period_start:%b %Y}" for b in R.bill_documents], index=len(R.bills) - 1)
@@ -260,22 +259,38 @@ with tabs[1]:
             except Exception as exc:  # noqa: BLE001 - show any parse error to the user
                 st.error(f"Could not read that file: {exc}")
     else:
-        has_key = bool(os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN"))
-        if not has_key:
-            st.info("Set ANTHROPIC_API_KEY to read bill photos and PDFs with Claude. The arithmetic checks below still apply.")
-        up = st.file_uploader("Bill photo or PDF", type=["png", "jpg", "jpeg", "webp", "pdf"], disabled=not has_key)
-        if up and has_key:
-            from unitwatt.extract import ExtractionError, extract_bill
+        from unitwatt.extract import PROVIDERS, ExtractionError, available_readers, default_reader, extract_bill, reader_label
 
-            key = sha256_bytes(up.getvalue())
+        readers = available_readers()
+        preferred = default_reader()
+        reader = st.selectbox("Read it with", readers, index=readers.index(preferred) if preferred in readers else 0,
+                              format_func=reader_label)
+        if reader == "offline":
+            st.caption("Free and private: the PDF's own text, or OCR for scans and photos, read on this computer. "
+                       "Works best on flat, well-lit photos; check the fields below either way.")
+        elif PROVIDERS[reader].note:
+            st.caption(PROVIDERS[reader].note)
+        more = [p for name, p in PROVIDERS.items() if name not in readers and p.key_env]
+        if more:
+            st.caption("More free readers: set " + ", ".join(f"[{p.key_env[0]}]({p.signup})" for p in more)
+                       + " (no card needed), or `UNITWATT_READER=ollama` for a local model.")
+        up = st.file_uploader("Bill photo or PDF", type=["png", "jpg", "jpeg", "webp", "pdf"])
+        if up:
+            key = (sha256_bytes(up.getvalue()), reader)
             if st.session_state.get("extracted_key") != key:
-                with st.spinner("Reading the bill..."):
+                with st.spinner(f"Reading the bill ({reader_label(reader)})..."):
                     try:
-                        st.session_state["extracted"] = extract_bill(up.getvalue(), up.type).bill
+                        st.session_state["extracted"] = extract_bill(up.getvalue(), up.type, reader)
                         st.session_state["extracted_key"] = key
                     except ExtractionError as exc:
+                        st.session_state.pop("extracted", None)
                         st.error(str(exc))
-            draft = st.session_state.get("extracted")
+            result = st.session_state.get("extracted")
+            if result is not None:
+                draft = result.bill
+                st.caption(f"Read by {result.model}.")
+                for issue in result.issues:
+                    (st.error if issue.severity == "error" else st.warning)(f"{issue.field}: {issue.message}")
 
     if draft is not None:
         with st.form("confirm_bill"):

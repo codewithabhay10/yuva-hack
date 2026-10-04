@@ -1,0 +1,39 @@
+{
+  "consumer_number": "SYN-HT-55021",
+  "discom": "Anantapuri Power Utility Limited",
+  "tariff_category": "HT-I (A) Industrial",
+  "period_start": "2026-06-01",
+  "period_end": "2026-06-30",
+  "energy_basis": "kVAh",
+  "kwh_total": 48210.0,
+  "kvah_total": 50220.0,
+  "zones": [
+    {
+      "zone": "peak",
+      "units": 12050.0,
+      "charges": 104112.0
+    },
+    {
+      "zone": "normal",
+      "units": 26170.0,
+      "charges": 188424.0
+    },
+    {
+      "zone": "off-peak",
+      "units": 12000.0,
+      "charges": 77760.0
+    }
+  ],
+  "max_demand_kva": 182.6,
+  "contract_demand_kva": 250.0,
+  "billing_demand_kva": 187.5,
+  "power_factor": 0.96,
+  "energy_charges": 370296.0,
+  "demand_charges": 75000.0,
+  "excess_demand_charges": 0.0,
+  "pf_adjustment": -3702.96,
+  "fixed_charges": 500.0,
+  "electricity_duty": 22079.65,
+  "other_charges": 0.0,
+  "total_amount": 464172.69
+}

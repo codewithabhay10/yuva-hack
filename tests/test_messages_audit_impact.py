@@ -1,13 +1,10 @@
 import sqlite3
-from types import SimpleNamespace
 
 import pytest
 
 from unitwatt.audit import AuditLog
-from unitwatt.extract import FALLBACK_BETA, MODEL, ExtractionError, extract_bill
 from unitwatt.messages import format_inr, format_lakh, numbers_in, owner_message
 from unitwatt.opportunities import ImpactAssumptions, impact_model
-from unitwatt.schemas import BillDocument
 
 
 def test_indian_number_format():
@@ -59,27 +56,3 @@ def test_impact_model_reproduces_the_deep_dive():
     half = impact_model(ImpactAssumptions(), units=1000, shift_realisation=0.5)
     assert half["fleet_tco2_year"] == r["fleet_tco2_year"]  # shifting saves no carbon
 
-
-class _FakeMessages:
-    def __init__(self, response):
-        self.response, self.kwargs = response, None
-
-    def parse(self, **kwargs):
-        self.kwargs = kwargs
-        return self.response
-
-
-def test_bill_extraction_request_and_validation(demo):
-    bill = demo.bill_documents[0]
-    fake = _FakeMessages(SimpleNamespace(stop_reason="end_turn", parsed_output=bill, model=MODEL))
-    result = extract_bill(b"%PDF-1.4", "application/pdf", client=SimpleNamespace(beta=SimpleNamespace(messages=fake)))
-    assert result.bill == bill and result.issues == []
-    assert fake.kwargs["model"] == MODEL and fake.kwargs["output_format"] is BillDocument
-    assert fake.kwargs["betas"] == [FALLBACK_BETA] and fake.kwargs["fallbacks"] == "default"
-    assert fake.kwargs["messages"][0]["content"][0]["type"] == "document"
-
-
-def test_bill_extraction_refusal():
-    fake = _FakeMessages(SimpleNamespace(stop_reason="refusal", parsed_output=None, model=MODEL))
-    with pytest.raises(ExtractionError):
-        extract_bill(b"\x89PNG", "image/png", client=SimpleNamespace(beta=SimpleNamespace(messages=fake)))

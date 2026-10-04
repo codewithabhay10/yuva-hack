@@ -9,5 +9,9 @@ jinja2>=3.1
 plotly>=5.22
 streamlit>=1.36
 pytest>=8.0
-# Optional: bill and register photo extraction with Claude (set ANTHROPIC_API_KEY)
-anthropic>=0.40
+pillow>=10.0
+# Bill reading, free: PDF text and rendering, offline OCR (models ship in the wheel), and
+# plain HTTP to a free vision API (Gemini free tier, Groq, OpenRouter or a local Ollama)
+pypdfium2>=4.30
+rapidocr_onnxruntime>=1.3,<2
+requests>=2.31

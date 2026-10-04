@@ -3,11 +3,11 @@
 Run with:  streamlit run app.py
 """
 
+from __future__ import annotations
+
 from dotenv import load_dotenv
 
 load_dotenv()
-
-from __future__ import annotations
 
 import re
 from dataclasses import replace

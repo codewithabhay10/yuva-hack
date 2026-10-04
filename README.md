@@ -95,6 +95,10 @@ The result is deliberately honest: zero-capex actions get this unit to **6.6%, s
 
 ## The dashboard
 
+![Four views of the prototype: a bill photo read into checked fields, energy per product, the optimised schedule and the savings proof](docs/demo/demo_collage.jpg)
+
+Slide-ready screenshots of each tab, taken from the running app, are in `docs/demo/`.
+
 | Tab | For | What it shows |
 |---|---|---|
 | Owner | Owner | Money that could have been kept this month, top three actions, the WhatsApp message in English or Hindi |

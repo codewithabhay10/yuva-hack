@@ -33,11 +33,13 @@ pip install -r requirements.txt
 
 streamlit run app.py          # the dashboard
 python -m unitwatt            # the same pipeline from the command line; writes reports to data/generated/
-pytest                        # 46 tests
+pytest                        # 50 tests
 ```
 
 Photo and PDF bill reading uses Claude's vision with structured output and is optional: set
-`ANTHROPIC_API_KEY` to turn it on. Everything else runs offline.
+`ANTHROPIC_API_KEY` to turn it on. Everything else runs offline. `data/sample_bills/` has a
+specimen HT bill (PDF, scan and phone photo) with its ground-truth JSON for testing it; the
+specimen is fictional and watermarked, not real factory data.
 
 ## The demo factory
 

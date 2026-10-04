@@ -1,0 +1,39 @@
+{
+  "consumer_number": "SYN-BR-000123",
+  "discom": "Patliputra Power Distribution Company Limited",
+  "tariff_category": "HTS-I Industrial (11 kV)",
+  "period_start": "2026-06-01",
+  "period_end": "2026-06-30",
+  "energy_basis": "kWh",
+  "kwh_total": 60178.4,
+  "kvah_total": 70264.2,
+  "zones": [
+    {
+      "zone": "solar",
+      "units": 27972.3,
+      "charges": 179022.72
+    },
+    {
+      "zone": "peak",
+      "units": 21282.8,
+      "charges": 204314.88
+    },
+    {
+      "zone": "normal",
+      "units": 10923.3,
+      "charges": 87386.4
+    }
+  ],
+  "max_demand_kva": 245.4,
+  "contract_demand_kva": 300.0,
+  "billing_demand_kva": 245.4,
+  "power_factor": 0.856,
+  "energy_charges": 470724.0,
+  "demand_charges": 110430.0,
+  "excess_demand_charges": 0.0,
+  "pf_adjustment": 18828.96,
+  "fixed_charges": 0.0,
+  "electricity_duty": 35998.98,
+  "other_charges": 0.0,
+  "total_amount": 635981.94
+}

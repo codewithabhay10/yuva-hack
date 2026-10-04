@@ -16,3 +16,9 @@ pypdfium2>=4.30
 rapidocr_onnxruntime>=1.3,<2
 requests>=2.31
 python-dotenv>=1.0
+# The WhatsApp/Telegram bot, the API server and PDF reports
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+reportlab>=4.0
+httpx>=0.27

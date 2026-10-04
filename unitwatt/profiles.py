@@ -6,6 +6,8 @@ Everything that differs between factories, sectors and states lives in YAML unde
 
 from __future__ import annotations
 
+import os
+import re
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
@@ -24,6 +26,35 @@ class Product:
     hsn: str
     heat_treated: bool
     aliases: tuple[str, ...]
+
+
+ROLES = ("owner", "supervisor", "accountant", "auditor")
+
+
+@dataclass(frozen=True)
+class Contact:
+    """A person who may talk to the factory's bot, and what they may do there."""
+
+    phone: str        # digits only, with country code, as WhatsApp sends it: 919812345678
+    name: str
+    role: str         # one of ROLES
+    language: str = "hi"
+
+
+def normalise_phone(value: str) -> str:
+    digits = re.sub(r"\D", "", str(value))
+    return "91" + digits if len(digits) == 10 else digits
+
+
+def parse_contacts(spec: str) -> list[Contact]:
+    """``UNITWATT_CONTACTS``: 'phone:role:name[:lang]' entries separated by commas."""
+    contacts = []
+    for item in filter(None, (part.strip() for part in spec.split(","))):
+        fields = item.split(":")
+        if len(fields) < 3 or fields[1] not in ROLES:
+            raise ValueError(f"Bad contact {item!r}: use phone:role:name[:lang] with role one of {', '.join(ROLES)}.")
+        contacts.append(Contact(normalise_phone(fields[0]), fields[2], fields[1], fields[3] if len(fields) > 3 else "hi"))
+    return contacts
 
 
 @dataclass(frozen=True)
@@ -56,6 +87,11 @@ class Factory:
     schedule_day: dict[str, Any]
     sector_template: dict[str, Any] = field(repr=False)
     workers: int = 0
+    contacts: tuple[Contact, ...] = ()
+
+    def contact(self, phone: str) -> Contact | None:
+        phone = normalise_phone(phone)
+        return next((c for c in self.contacts if c.phone == phone), None)
 
     @property
     def product_ids(self) -> list[str]:
@@ -160,7 +196,17 @@ def load_factory(path_or_id: str | Path = "demo_forge") -> Factory:
         schedule_day=raw.get("schedule_day", {}),
         sector_template=load_sector(raw["sector"]),
         workers=int(raw.get("workers", 0)),
+        contacts=_contacts(raw),
     )
+
+
+def _contacts(raw: dict[str, Any]) -> tuple[Contact, ...]:
+    """Contacts from the profile, then UNITWATT_CONTACTS (real numbers stay out of the repo)."""
+    listed = [Contact(normalise_phone(c["phone"]), c["name"], c["role"], c.get("language", raw.get("language", "hi")))
+              for c in raw.get("contacts", [])]
+    extra = parse_contacts(os.environ.get("UNITWATT_CONTACTS", ""))
+    by_phone = {c.phone: c for c in listed + extra}
+    return tuple(by_phone.values())
 
 
 @lru_cache(maxsize=None)

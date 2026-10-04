@@ -237,6 +237,12 @@ def _owner_facts(
     )
 
 
+# What the demo owner changed on 1 July; a real factory records its own measures.
+DEMO_MEASURES = [
+    "Night and Sunday switch-off routine; compressed-air leaks repaired (from 1 Jul 2026)",
+    "Billet heating and shot blasting moved into solar hours (from 1 Jul 2026)",
+]
+
 DEMO_WINDOWS = Windows(
     baseline=(date(2026, 4, 1), date(2026, 6, 30)),
     reporting=(date(2026, 7, 1), date(2026, 9, 30)),

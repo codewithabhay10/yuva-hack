@@ -26,8 +26,9 @@ from unitwatt.ingest import factor_table, parse_daily_entry
 from unitwatt.ledger import monthly_summary
 from unitwatt.messages import format_inr, format_lakh, owner_message
 from unitwatt.opportunities import ImpactAssumptions, impact_model
-from unitwatt.pipeline import run_demo
+from unitwatt.pipeline import DEMO_MEASURES, run_demo
 from unitwatt.report import emissions_statement_html, savings_report_html
+from unitwatt.report_pdf import savings_report_pdf
 from unitwatt.scheduler import optimise, slot_label, slot_of
 from unitwatt.schemas import BillDocument, ZoneReading, has_errors, validate_bill
 from unitwatt.tariff import SLOT_HOURS, SLOT_MINUTES, SLOTS_PER_DAY
@@ -40,10 +41,7 @@ GOOD, WARNING, CRITICAL = "#0ca30c", "#fab219", "#d03b3b"
 BLUES = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
 BAND_FILL = {"peak": "rgba(235,104,52,0.10)", "solar": "rgba(237,161,0,0.10)", "off-peak": "rgba(42,120,214,0.08)"}
 
-MEASURES = [
-    "Night and Sunday switch-off routine; compressed-air leaks repaired (from 1 Jul 2026)",
-    "Billet heating and shot blasting moved into solar hours (from 1 Jul 2026)",
-]
+MEASURES = DEMO_MEASURES
 
 
 def rs(value: float) -> str:
@@ -107,7 +105,8 @@ with st.sidebar:
     )
 
 tabs = st.tabs(
-    ["Owner", "Bill check", "Energy per product", "Schedule", "Savings proof", "Carbon & CBAM", "Alerts", "Data & audit", "Impact model"]
+    ["Owner", "WhatsApp bot", "Bill check", "Energy per product", "Schedule", "Savings proof", "Carbon & CBAM", "Alerts", "Data & audit",
+     "Impact model"]
 )
 
 # --------------------------------------------------------------------------------------
@@ -175,10 +174,84 @@ with tabs[0]:
     plot(style(fig, 300, y="₹ per month", hover="closest"))
 
 # --------------------------------------------------------------------------------------
-# 2. Bill check (P1, P10)
+# 2. WhatsApp bot (P2, P14, P18), simulated: the same engine that answers on WhatsApp and Telegram
 # --------------------------------------------------------------------------------------
 
 with tabs[1]:
+    from unitwatt.bot import Bot, BotStore, Incoming
+
+    st.subheader("The WhatsApp bot")
+    st.caption("The same bot that answers on WhatsApp and Telegram, running here without any accounts. Chat as the owner, "
+               "the supervisor or the accountant: each sees only what their role allows.")
+    if "bot_store" not in st.session_state:
+        st.session_state["bot_store"] = BotStore()
+    chat_bot = Bot(R, st.session_state["bot_store"])
+    people = {f"{c.name} · {c.role}": c for c in F.contacts}
+    left, right = st.columns([3, 2], gap="large")
+    with left:
+        person = people[st.radio("Chat as", list(people), horizontal=True, key="bot_person")]
+        history = st.session_state.setdefault("bot_history", {}).setdefault(person.phone, [])
+
+        def send(msg: Incoming, shown: str) -> None:
+            history.append(("in", shown, [], None))
+            for reply in chat_bot.handle(msg):
+                history.append(("out", reply.text, reply.buttons, reply.document))
+            st.rerun()
+
+        box = st.container(height=520, border=True)
+        with box:
+            if not history:
+                st.caption("Say hi to start, or try: 1 · flange 1.5t, crank 1.2t, gear 1.4t, 2 shifts · a bill photo.")
+            for i, (direction, text, buttons, document) in enumerate(history):
+                with st.chat_message("user" if direction == "in" else "assistant", avatar="🧑‍🏭" if direction == "in" else "⚡"):
+                    st.markdown(text.replace("\n", "  \n"))
+                    if document:
+                        st.download_button(f"📎 {document[0]}", document[1], file_name=document[0], mime=document[2], key=f"doc_{person.phone}_{i}")
+        if history and history[-1][0] == "out" and history[-1][2]:
+            for col, (bid, title) in zip(st.columns(len(history[-1][2])), history[-1][2]):
+                if col.button(title, key=f"btn_{person.phone}_{len(history)}_{bid}", width="stretch"):
+                    send(Incoming(sender=person.phone, text=bid, channel="dashboard"), title)
+        typed = st.chat_input("Type a message, e.g. hi, 1, flange 1.5t, crank 1.2t, 2 shifts", key="bot_input")
+        if typed:
+            send(Incoming(sender=person.phone, text=typed, channel="dashboard"), typed)
+        c = st.columns(2)
+        upload = c[0].file_uploader("Send a bill photo or PDF", type=["png", "jpg", "jpeg", "webp", "pdf"],
+                                    key=f"bot_file_{len(history)}")
+        if upload is not None:
+            kind = "document" if upload.type == "application/pdf" else "image"
+            send(Incoming(sender=person.phone, kind=kind, media=upload.getvalue(), mime=upload.type, filename=upload.name,
+                          channel="dashboard"), f"📎 {upload.name}")
+        voice = c[1].audio_input("Or record a voice note", key=f"bot_voice_{len(history)}")
+        if voice is not None:
+            send(Incoming(sender=person.phone, kind="audio", media=voice.getvalue(), mime="audio/wav", channel="dashboard"), "🎙️ voice note")
+    with right:
+        store = st.session_state["bot_store"]
+        st.markdown("**Saved through the bot**")
+        prod = store.production_frame()
+        if prod.empty:
+            st.caption("Nothing yet. Production entries and bills confirmed in the chat appear here, and in the audit trail.")
+        else:
+            prod["product"] = prod["product"].map(lambda p: F.product(p).name)
+            st.dataframe(prod[["day", "product", "tonnes", "shifts", "source"]], hide_index=True, width="stretch")
+        bills = store.bills_frame()
+        if not bills.empty:
+            st.dataframe(bills[["period_start", "total", "audit_entry"]], hide_index=True, width="stretch",
+                         column_config={"total": st.column_config.NumberColumn("Total ₹", format="%,.2f")})
+        with st.expander("Connect it to real WhatsApp or Telegram"):
+            st.markdown(
+                "- **WhatsApp:** set `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN` and "
+                "`WHATSAPP_APP_SECRET`, run `uvicorn unitwatt.server:app`, and register `https://<your-host>/webhook/whatsapp` "
+                "in the Meta app.\n"
+                "- **Telegram:** create a bot with @BotFather, set `TELEGRAM_BOT_TOKEN`, run `python -m unitwatt.bot telegram`.\n"
+                "- **Voice notes:** set `GROQ_API_KEY` (free Whisper) or run a local Whisper server with `UNITWATT_STT=local`.\n"
+                "- **People and roles:** add real numbers as `UNITWATT_CONTACTS=phone:role:name,...`."
+            )
+
+# --------------------------------------------------------------------------------------
+# 2. Bill check (P1, P10)
+# --------------------------------------------------------------------------------------
+
+with tabs[2]:
     st.subheader("The ten-minute bill check")
     st.caption("Needs nothing but the electricity bills. Finds money before the owner is asked for production data.")
     table = pd.DataFrame(
@@ -361,7 +434,7 @@ with tabs[1]:
 # 3. Energy per product (P8, P9)
 # --------------------------------------------------------------------------------------
 
-with tabs[2]:
+with tabs[3]:
     M = R.baseline_model
     st.subheader("Energy per product, without sub-meters")
     st.caption(
@@ -443,7 +516,7 @@ with tabs[2]:
 # 4. Schedule (P12)
 # --------------------------------------------------------------------------------------
 
-with tabs[3]:
+with tabs[4]:
     st.subheader("A tariff-aware schedule for a typical day")
     st.caption("CP-SAT over 96 fifteen-minute slots: energy cost + demand charges + excess-demand surcharge + furnace reheat losses, "
                "within the owner's shift limits, one batch per machine, and heat-before-forge within an hour.")
@@ -526,7 +599,7 @@ with tabs[3]:
 # 5. Savings proof (P15)
 # --------------------------------------------------------------------------------------
 
-with tabs[4]:
+with tabs[5]:
     st.subheader("Audit-ready proof of savings")
     st.caption(f"IPMVP Option C (whole facility). Baseline {S.baseline[0]:%d %b} to {S.baseline[1]:%d %b}; "
                f"reporting {S.reporting[0]:%d %b} to {S.reporting[1]:%d %b %Y}. The certified energy auditor still signs the M&V.")
@@ -581,14 +654,17 @@ with tabs[4]:
     if consent and st.button("Record consent"):
         e = R.audit.record_consent("savings report", recipient, F.owner_name, purpose)
         st.success(f"Consent recorded as audit entry #{e.id}.")
-    st.download_button("Download savings report (HTML, prints to PDF)", savings_report_html(R, [m for m in measures if m.strip()]),
-                       file_name="unitwatt_savings_report.html", mime="text/html", disabled=not consent)
+    c = st.columns(2)
+    c[0].download_button("Download savings report (PDF)", savings_report_pdf(R, [m for m in measures if m.strip()]),
+                         file_name="unitwatt_savings_report.pdf", mime="application/pdf", disabled=not consent, type="primary")
+    c[1].download_button("Download as HTML", savings_report_html(R, [m for m in measures if m.strip()]),
+                         file_name="unitwatt_savings_report.html", mime="text/html", disabled=not consent)
 
 # --------------------------------------------------------------------------------------
 # 6. Carbon & CBAM (P16)
 # --------------------------------------------------------------------------------------
 
-with tabs[5]:
+with tabs[6]:
     E = R.emissions
     st.subheader("Product-level embedded emissions")
     st.caption(f"{E.period[0]:%d %b} to {E.period[1]:%d %b %Y}. Electricity allocated with the energy model; totals reconcile to the meter.")
@@ -647,7 +723,7 @@ with tabs[5]:
 # 7. Alerts (P11)
 # --------------------------------------------------------------------------------------
 
-with tabs[6]:
+with tabs[7]:
     D = R.drift
     st.subheader("Slow efficiency loss")
     st.caption(f"Each production day is compared with what the plant's own data from {D.reference[0]:%d %b} to {D.reference[1]:%d %b} "
@@ -681,7 +757,7 @@ with tabs[6]:
 # 8. Data & audit (P2 to P7, P17, P18)
 # --------------------------------------------------------------------------------------
 
-with tabs[7]:
+with tabs[8]:
     st.subheader("The daily ledger and where every number came from")
     st.markdown(f"**Data quality {R.quality.score:.1f}/100 (grade {R.quality.grade})**: shown on every report so nobody over-trusts thin data.")
     st.dataframe(R.quality.as_frame(), hide_index=True, width="stretch")
@@ -739,7 +815,7 @@ with tabs[7]:
 # 9. Impact model (from the deep dive)
 # --------------------------------------------------------------------------------------
 
-with tabs[8]:
+with tabs[9]:
     st.subheader("Impact model")
     st.caption("The deep dive's illustrative mid-sized forging unit. Every input is an assumption to replace with real bills: "
                "judges score the clarity of the baseline as much as the size of the number.")

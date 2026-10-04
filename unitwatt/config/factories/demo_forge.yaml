@@ -12,6 +12,13 @@ owner_name: Ramesh
 language: hi
 workers: 48
 
+# Who may talk to the factory's WhatsApp or Telegram bot, and what they may do there.
+# These numbers are placeholders for the demo; add real ones in UNITWATT_CONTACTS (see .env.example).
+contacts:
+  - {phone: "910000000001", name: Ramesh, role: owner, language: hi}
+  - {phone: "910000000002", name: Sunil, role: supervisor, language: hi}
+  - {phone: "910000000003", name: Priya, role: accountant, language: en}
+
 shift_window: {start: "07:00", end: "23:00"}
 working_weekdays: [0, 1, 2, 3, 4, 5]   # Monday to Saturday
 essential_night_load_kw: 3.0           # security lights, server, guard room

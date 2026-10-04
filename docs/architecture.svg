@@ -165,9 +165,11 @@
 <rect class="bx " x="1218" y="348" width="136" height="64" rx="6"/>
 <text class="t1" x="1230" y="370">Owner</text>
 <text class="t2" x="1230" y="388">dashboard, message</text>
-<rect class="bx plan" x="1218" y="444" width="136" height="64" rx="6"/>
+<rect class="bx " x="1218" y="444" width="136" height="80" rx="6"/>
 <text class="t1" x="1230" y="466">Chat bot · P18</text>
 <text class="t2" x="1230" y="484">WhatsApp, Telegram</text>
+<rect class="pill" x="1228" y="498" width="116" height="18" rx="9"/>
+<text class="pt" x="1286.0" y="511" text-anchor="middle">not live-tested</text>
 <rect class="bx " x="1218" y="548" width="136" height="64" rx="6"/>
 <text class="t1" x="1230" y="570">Supervisor</text>
 <text class="t2" x="1230" y="588">shift plan</text>
@@ -175,10 +177,10 @@
 <polyline class="ar" points="1190,184 1216,184" marker-end="url(#ah)"/>
 <polyline class="ar" points="1190,380 1216,380" marker-end="url(#ah)"/>
 <polyline class="ar" points="1190,580 1216,580" marker-end="url(#ah)"/>
-<polyline class="ar plan" points="1190,400 1204,400 1204,476 1216,476" marker-end="url(#ahd)"/>
-<rect class="bx plan" x="568" y="664" width="160" height="56" rx="6"/>
-<text class="t1" x="580" y="686">API + PostgreSQL</text>
-<text class="t2" x="580" y="704">replaces in-memory run</text>
+<polyline class="ar" points="1190,400 1204,400 1204,476 1216,476" marker-end="url(#ah)"/>
+<rect class="bx " x="568" y="664" width="160" height="56" rx="6"/>
+<text class="t1" x="580" y="686">API · FastAPI</text>
+<text class="t2" x="580" y="704">PostgreSQL planned</text>
 <polyline class="ar" points="342,500 342,746" marker-end="url(#ah)"/>
 <text class="al" x="348" y="700" text-anchor="start">SHA-256 on arrival</text>
 <rect class="bx audit" x="16" y="748" width="1338" height="56" rx="6"/>

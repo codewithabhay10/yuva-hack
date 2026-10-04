@@ -31,11 +31,15 @@ Dashed boxes are built but not live-tested or use placeholder values; dotted box
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-streamlit run app.py          # the dashboard
-python -m unitwatt            # the same pipeline from the command line; writes reports to data/generated/
-pytest                        # 67 tests
+streamlit run app.py              # the dashboard, including a WhatsApp bot simulator
+python -m unitwatt                # the same pipeline from the command line; writes reports to data/generated/
+python -m unitwatt.bot chat       # chat with the bot in the terminal, as the owner, supervisor or accountant
+uvicorn unitwatt.server:app       # the WhatsApp webhook and REST API (see "The WhatsApp bot")
+pytest                            # 97 tests
 python -m unitwatt.extract_eval   # score bill reading against the sample bills, field by field
 ```
+
+Copy `.env.example` to `.env` for keys and settings; every one of them is optional.
 
 Everything runs offline and free. No paid API is needed anywhere.
 
@@ -66,6 +70,60 @@ run `python -m unitwatt.extract_eval --reader gemini`.
 
 `data/sample_bills/` has the specimen bills and the ground-truth JSON for each. They are
 fictional and watermarked, not real factory data.
+
+## The WhatsApp bot
+
+The owner, supervisor and accountant use UnitWatt where they already are: WhatsApp. One engine
+(`unitwatt/bot/core.py`) answers on WhatsApp, on Telegram, in the terminal and in the dashboard's
+*WhatsApp bot* tab, in Hindi or English.
+
+| Send | Gets back | Who may |
+|---|---|---|
+| `hi` | A menu of what this person can do, with reply buttons | Everyone registered |
+| `1` | This month's report: money that could have been kept, savings so far, energy per tonne, the top action, alerts. `1` again gives the top three actions with cost and payback | Owner, accountant |
+| `2` | Asks for consent, records it in the audit trail, then sends the savings report as a PDF for the bank or ADEETIE auditor | Owner |
+| `3` | Tomorrow's batch plan from the scheduler, with the saving and the peak | Owner, supervisor |
+| `4` | Drift alarm and penalties on the latest bill | Owner, supervisor, accountant |
+| `फ्लेंज 1.5 टन, crank 1.2t, gear 1400 kg, 2 shifts` | The parsed entry to confirm; saved on *Save* | Owner, supervisor |
+| A photo or PDF of the bill | The bill read offline, arithmetic checks, penalties found (for example a ₹19,959 power-factor penalty); saved on *Save* | Owner, accountant |
+| A voice note | Transcribed with Whisper, then handled like typed text | Owner, supervisor |
+| `हिंदी` / `English` | Switches language | Everyone |
+
+People and roles come from the factory profile (`contacts:` in `config/factories/*.yaml`); add real
+numbers in `UNITWATT_CONTACTS=phone:role:name,...` so they never enter the repo. Numbers that are not
+registered get a polite refusal and nothing else. Everything people send is kept in a SQLite store
+(`data/unitwatt_bot.sqlite`) and every file is hashed into the audit trail.
+
+**Try it without any accounts:** the dashboard's *WhatsApp bot* tab, or `python -m unitwatt.bot chat`.
+
+**Connect WhatsApp (Meta Cloud API, free to start):**
+
+1. At developers.facebook.com create an app, add the *WhatsApp* product, and note the test number's
+   *Phone number ID* and the temporary *access token*. Add your own number as a test recipient.
+2. Set `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN` (any string you choose) and
+   `WHATSAPP_APP_SECRET` (App settings → Basic) in `.env`, and add your number to `UNITWATT_CONTACTS`.
+3. Run `uvicorn unitwatt.server:app --port 8000` and expose it over HTTPS, for example with
+   `cloudflared tunnel --url http://localhost:8000` or `ngrok http 8000`.
+4. In the app's WhatsApp → Configuration, set the callback URL to `https://<host>/webhook/whatsapp`, enter
+   the same verify token, and subscribe to the `messages` field.
+5. Send `hi` to the test number. `GET /health` shows what is configured.
+
+**Connect Telegram (free, no public URL needed):** create a bot with @BotFather, set
+`TELEGRAM_BOT_TOKEN`, and run `python -m unitwatt.bot telegram`. Each person shares their phone number
+once, and the bot then treats them exactly as on WhatsApp.
+
+**Voice notes:** set `GROQ_API_KEY` for Groq's free hosted Whisper, or run a Whisper server on your own
+machine that speaks the OpenAI audio API and set `UNITWATT_STT=local`, so audio never leaves it.
+
+**REST API:** set `UNITWATT_API_TOKEN` and send it as `X-API-Key` to use `/api/report`, `/api/schedule`,
+`/api/production`, `/api/bills/read` and `/api/data`. Without the token the REST API stays off, so
+exposing the webhook never exposes the data.
+
+**Tested:** the bot engine, roles, confirmations, consent and PDF report, the WhatsApp webhook
+(handshake, signature check, media download, reply buttons, document upload, repeated deliveries
+answered once), the REST API and Telegram (number linking, buttons, photos, polling) all run in the test
+suite against local stand-ins for Meta's, Telegram's and Groq's servers. None of them has yet been run
+against the real services, because this repository's build environment cannot reach them.
 
 ## The demo factory
 
@@ -102,6 +160,7 @@ Slide-ready screenshots of each tab, taken from the running app, are in `docs/de
 | Tab | For | What it shows |
 |---|---|---|
 | Owner | Owner | Money that could have been kept this month, top three actions, the WhatsApp message in English or Hindi |
+| WhatsApp bot | Owner, supervisor, accountant | The bot itself, simulated: chat as each person, send bill photos, PDFs and voice notes, see what was saved |
 | Bill check | Owner, accountant | The ten-minute bill check, contract-demand sizing, bill photo/PDF reading (offline or a free API) with arithmetic checks and confirmation |
 | Energy per product | Supervisor, auditor | Regression SEC with 90% intervals, 15-minute load heatmap, idle-waste analysis |
 | Schedule | Supervisor | CP-SAT schedule against today's schedule and a naive shift, with the owner's shift limits and a peak cap |
@@ -128,10 +187,11 @@ Slide-ready screenshots of each tab, taken from the running app, are in `docs/de
 | P12 Shifting creates peaks | `scheduler.py` | OR-Tools CP-SAT: energy + demand + excess + reheat cost; machine, order and shift constraints |
 | P13 Too many recommendations | `opportunities.rank_opportunities` | Ranked by ₹/year, confidence and payback; top three shown |
 | P14 Plain language | `messages.py` | Template-constrained: every number comes from a computed field (tested) |
+| P18 Reach owners where they are | `bot/`, `server.py` | One bot engine behind WhatsApp (Cloud API webhook), Telegram and a simulator; roles per phone number; voice notes through Whisper |
 | P15 Proof of savings | `mv.py` | IPMVP Option C, CV(RMSE), NMBE, R², ASHRAE 14 fractional savings uncertainty |
 | P16 Product emissions, CBAM | `emissions.py` | Scope 1, 2 and precursors allocated with P8, reconciling to the meter; CBAM scope by HSN |
-| P17 Traceability | `audit.py`, `report.py` | SHA-256 per document, hash-chained append-only log, source appendix on every report |
-| P19 Sensitive data | `audit.record_consent` | Explicit consent recorded before any report is shared |
+| P17 Traceability | `audit.py`, `report.py`, `report_pdf.py` | SHA-256 per document, hash-chained append-only log, source appendix on every report (HTML and PDF) |
+| P19 Sensitive data | `audit.record_consent`, `bot/core.py` | Explicit consent recorded before any report is shared; the bot answers only registered numbers, each within its role; the REST API needs a token |
 | P20 Every state differs | `config/` | Tariffs, sectors and factories are data, not code |
 
 ## What is real and what is illustrative
@@ -149,8 +209,7 @@ Slide-ready screenshots of each tab, taken from the running app, are in `docs/de
 
 - Load one real factory's bills: add its DISCOM tariff as a YAML file and its profile under
   `config/factories/`.
-- A Telegram bot for the prototype and the WhatsApp Cloud API for the pilot, built on
-  `parse_daily_entry` and `owner_message`.
-- Voice notes through Bhashini or AI4Bharat text-to-speech.
-- PostgreSQL/TimescaleDB with row-level security in place of SQLite; a FastAPI layer over `pipeline.run`.
-- PDF rendering of the reports with WeasyPrint (the HTML is already print-ready).
+- Put the WhatsApp bot on a verified business number and test it with the pilot's owner and supervisor.
+- Spoken replies in Hindi through Bhashini or AI4Bharat text-to-speech (voice notes in already work).
+- PostgreSQL/TimescaleDB with row-level security in place of SQLite, and re-running the analysis when
+  the bot saves new production or bills.

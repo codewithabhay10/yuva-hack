@@ -79,7 +79,7 @@ PROVIDERS: dict[str, Provider] = {
         "On the free tier Google may use uploads to improve its models, so use it for specimen bills or with the owner's consent.",
     ),
     "groq": Provider(
-        "groq", "Groq (free tier)", "https://api.groq.com/openai/v1", "meta-llama/llama-4-scout-17b-16e-instruct",
+        "groq", "Groq (free tier)", "https://api.groq.com/openai/v1", "qwen/qwen3.8-27b",
         ("GROQ_API_KEY",), "https://console.groq.com/keys",
     ),
     "openrouter": Provider(

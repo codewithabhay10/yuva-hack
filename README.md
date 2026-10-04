@@ -16,6 +16,15 @@ bills, meter load surveys, fuel purchases, production registers) into four outpu
 
 No new hardware is needed.
 
+## Architecture
+
+![UnitWatt architecture](docs/architecture.svg)
+
+Every module reads one daily ledger. The energy model fitted on it is reused as the savings
+baseline, to split emissions across products, and as the expectation the drift alarm checks
+against. The tariff engine reprices bills and prices every 15-minute slot for the scheduler.
+Dashed boxes are built but not live-tested or use placeholder values; dotted boxes are planned.
+
 ## Run it
 
 ```bash

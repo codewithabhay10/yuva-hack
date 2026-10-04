@@ -1,0 +1,195 @@
+<svg viewBox="0 0 1370 862" width="1370" height="862" role="img" aria-label="UnitWatt architecture: five kinds of factory paperwork pass through format adapters into one daily ledger. The ledger feeds an energy model reused by savings proof, emissions and drift alarms, an idle-waste check, and a tariff engine that drives the bill check and the scheduler. Rupee findings are ranked into the owner&#x27;s message; reports go to the banker, the EU buyer and the supervisor; every input is hashed into an audit trail." xmlns="http://www.w3.org/2000/svg">
+<title>UnitWatt architecture</title>
+<style>
+:root,svg{--bg:#f5f7f6;--box:#ffffff;--fg:#17201d;--muted:#5d6b66;--line:#7f8c87;--accent:#0f6b5c;--accent-ink:#0b5a4c;--tint:#e3f1ed;--warn:#b7791f;--warn-bg:#fdf3e1;--warn-ink:#8a5a12;--ui-font:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--mono-font:'IBM Plex Mono',ui-monospace,Menlo,monospace;}
+@media (prefers-color-scheme: dark){:root,svg{--bg:#121715;--box:#1a211e;--fg:#e4ebe8;--muted:#9aa8a3;--line:#7d8b86;--accent:#3fb8a2;--accent-ink:#6fd0bd;--tint:#16302a;--warn:#e0a54a;--warn-bg:#2e2412;--warn-ink:#f0c27a;}}
+
+.bg{fill:var(--bg)}
+.bx{fill:var(--box);stroke:var(--line);stroke-width:1.2}
+.bx.ledger{fill:var(--tint);stroke:var(--accent);stroke-width:1.6}
+.bx.audit{fill:var(--box);stroke:var(--line)}
+.bx.plan{fill:none;stroke:var(--muted);stroke-dasharray:2 4;stroke-width:1.4}
+.pill{fill:var(--warn-bg);stroke:var(--warn);stroke-dasharray:4 3;stroke-width:1.2}
+.pt{fill:var(--warn-ink);font:600 10px var(--mono-font)}
+.t1{fill:var(--fg);font:600 13px var(--ui-font)}
+.t2{fill:var(--muted);font:400 11px var(--ui-font)}
+.t2.em{fill:var(--accent-ink)}
+.mono{fill:var(--muted);font:400 10px var(--mono-font)}
+.hd{fill:var(--fg);font:600 11.5px var(--ui-font);letter-spacing:.06em;text-transform:uppercase}
+.al{fill:var(--muted);font:400 10px var(--ui-font)}
+.ar{fill:none;stroke:var(--line);stroke-width:1.3}
+.ar.plan{stroke:var(--muted);stroke-dasharray:2 4}
+.ahp{fill:var(--line)}
+.ahq{fill:var(--muted)}
+</style>
+<rect class="bg" x="0" y="0" width="1370" height="862"/>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahp" d="M0,0 L10,5 L0,10 z"/></marker><marker id="ahd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahq" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text class="hd" x="16" y="24">Factory paperwork</text>
+<text class="mono" x="16" y="40">synthetic.py makes the demo set</text>
+<text class="hd" x="236" y="24">1 · Get data in</text>
+<text class="mono" x="236" y="40">ingest · schemas · extract</text>
+<text class="hd" x="568" y="24">2 · Daily ledger</text>
+<text class="mono" x="568" y="40">ledger.py</text>
+<text class="hd" x="800" y="24">3–5 · Analyse, decide, prove</text>
+<text class="mono" x="800" y="40">analytics · scheduler · mv · emissions</text>
+<text class="hd" x="1218" y="24">6 · Deliver</text>
+<text class="mono" x="1218" y="40">app.py · report.py</text>
+<rect class="bx " x="16" y="60" width="172" height="72" rx="6"/>
+<text class="t1" x="28" y="82">Electricity bills</text>
+<text class="t2" x="28" y="100">PDF · photo · JSON, monthly</text>
+<rect class="bx " x="236" y="60" width="212" height="72" rx="6"/>
+<text class="t1" x="248" y="82">Bill schema + checks</text>
+<text class="t2" x="248" y="100">zones · kVAh ≥ kWh · total</text>
+<rect class="pill" x="246" y="106" width="192" height="18" rx="9"/>
+<text class="pt" x="342.0" y="119" text-anchor="middle">Claude vision (optional)</text>
+<polyline class="ar" points="188,96 234,96" marker-end="url(#ah)"/>
+<polyline class="ar" points="448,84 566,84" marker-end="url(#ah)"/>
+<text class="al" x="458" y="78" text-anchor="start">zone kWh, MD, ₹</text>
+<rect class="bx " x="16" y="152" width="172" height="72" rx="6"/>
+<text class="t1" x="28" y="174">Meter load survey</text>
+<text class="t2" x="28" y="192">portal CSV, every 15 min</text>
+<rect class="bx " x="236" y="152" width="212" height="72" rx="6"/>
+<text class="t1" x="248" y="174">Load-survey adapters</text>
+<text class="t2" x="248" y="192">2 formats, gaps flagged</text>
+<polyline class="ar" points="188,188 234,188" marker-end="url(#ah)"/>
+<polyline class="ar" points="448,188 566,188" marker-end="url(#ah)"/>
+<text class="al" x="458" y="182" text-anchor="start">15-min kWh, kVAh</text>
+<rect class="bx " x="16" y="244" width="172" height="72" rx="6"/>
+<text class="t1" x="28" y="266">Production register</text>
+<text class="t2" x="28" y="284">CSV · chat · photo, daily</text>
+<rect class="bx " x="236" y="244" width="212" height="72" rx="6"/>
+<text class="t1" x="248" y="266">Register + chat parser</text>
+<text class="t2" x="248" y="284">Hindi · English · kg/quintal</text>
+<rect class="pill" x="246" y="290" width="192" height="18" rx="9"/>
+<text class="pt" x="342.0" y="303" text-anchor="middle">photo via Claude (optional)</text>
+<polyline class="ar" points="188,280 234,280" marker-end="url(#ah)"/>
+<polyline class="ar" points="448,268 566,268" marker-end="url(#ah)"/>
+<text class="al" x="458" y="262" text-anchor="start">t / product / day</text>
+<rect class="bx " x="16" y="336" width="172" height="72" rx="6"/>
+<text class="t1" x="28" y="358">Fuel invoices + dips</text>
+<text class="t2" x="28" y="376">furnace oil, monthly</text>
+<rect class="bx " x="236" y="336" width="212" height="72" rx="6"/>
+<text class="t1" x="248" y="358">Fuel stock-flow</text>
+<text class="t2" x="248" y="376">opening + bought − closing</text>
+<polyline class="ar" points="188,372 234,372" marker-end="url(#ah)"/>
+<polyline class="ar" points="448,372 566,372" marker-end="url(#ah)"/>
+<text class="al" x="458" y="366" text-anchor="start">litres / month</text>
+<rect class="bx " x="16" y="428" width="172" height="72" rx="6"/>
+<text class="t1" x="28" y="450">Generator (DG) log</text>
+<text class="t2" x="28" y="468">hours · litres · kWh</text>
+<rect class="bx " x="236" y="428" width="212" height="72" rx="6"/>
+<text class="t1" x="248" y="450">DG log reader</text>
+<text class="t2" x="248" y="468">checked against diesel stock</text>
+<polyline class="ar" points="188,464 234,464" marker-end="url(#ah)"/>
+<polyline class="ar" points="448,464 566,464" marker-end="url(#ah)"/>
+<text class="al" x="458" y="458" text-anchor="start">DG kWh, litres</text>
+<rect class="bx ledger" x="568" y="60" width="160" height="440" rx="6"/>
+<text class="t1" x="580" y="84">Daily ledger</text>
+<text class="t2" x="580" y="102">one row per day</text>
+<text class="t2" x="580" y="132">grid + DG kWh</text>
+<text class="t2" x="580" y="152">kWh by ToD band</text>
+<text class="t2" x="580" y="172">tonnes per product</text>
+<text class="t2" x="580" y="192">fuel spread by tonnes</text>
+<text class="t2 em" x="580" y="228">meter gaps refilled</text>
+<text class="t2 em" x="580" y="246">from the bill and</text>
+<text class="t2 em" x="580" y="264">labelled estimated</text>
+<text class="t2 em" x="580" y="302">data-quality score</text>
+<text class="t2 em" x="580" y="320">on every report (P6)</text>
+<rect class="bx " x="800" y="60" width="156" height="64" rx="6"/>
+<text class="t1" x="812" y="82">Energy model · P8</text>
+<text class="t2" x="812" y="100">NNLS: Σ SEC × tonnes</text>
+<rect class="bx " x="1030" y="60" width="160" height="64" rx="6"/>
+<text class="t1" x="1042" y="82">Savings proof · P15</text>
+<text class="t2" x="1042" y="100">IPMVP Option C</text>
+<rect class="bx " x="1030" y="152" width="160" height="64" rx="6"/>
+<text class="t1" x="1042" y="174">Emissions · P16</text>
+<text class="t2" x="1042" y="192">Scope 1, 2, precursor</text>
+<rect class="bx " x="1030" y="244" width="160" height="64" rx="6"/>
+<text class="t1" x="1042" y="266">Drift alarm · P11</text>
+<text class="t2" x="1042" y="284">CUSUM on residuals</text>
+<rect class="bx " x="800" y="244" width="156" height="64" rx="6"/>
+<text class="t1" x="812" y="266">Idle waste · P9</text>
+<text class="t2" x="812" y="284">no-production load</text>
+<polyline class="ar" points="728,92 798,92" marker-end="url(#ah)"/>
+<text class="al" x="734" y="86" text-anchor="start">daily rows</text>
+<polyline class="ar" points="728,276 798,276" marker-end="url(#ah)"/>
+<text class="al" x="734" y="270" text-anchor="start">15-min load</text>
+<polyline class="ar" points="956,92 976,92 976,276"/>
+<polyline class="ar" points="976,92 1028,92" marker-end="url(#ah)"/>
+<text class="al" x="980" y="86" text-anchor="start">baseline</text>
+<polyline class="ar" points="976,184 1028,184" marker-end="url(#ah)"/>
+<text class="al" x="980" y="178" text-anchor="start">allocates</text>
+<polyline class="ar" points="976,276 1028,276" marker-end="url(#ah)"/>
+<text class="al" x="980" y="270" text-anchor="start">predicts</text>
+<rect class="bx " x="800" y="348" width="390" height="64" rx="6"/>
+<text class="t1" x="812" y="370">Ranking · P13  →  owner message · P14</text>
+<text class="t2" x="812" y="388">top 3 actions by ₹ a year · English / Hindi text</text>
+<polyline class="ar" points="878,308 878,346" marker-end="url(#ah)"/>
+<text class="al" x="884" y="332" text-anchor="start">₹ idle</text>
+<polyline class="ar" points="1110,308 1110,346" marker-end="url(#ah)"/>
+<text class="al" x="1116" y="332" text-anchor="start">₹ drift</text>
+<rect class="bx " x="16" y="540" width="172" height="104" rx="6"/>
+<text class="t1" x="28" y="562">Config as data · P20</text>
+<text class="mono" x="28" y="580">tariffs/*.yaml</text>
+<text class="mono" x="28" y="594">sectors · factories</text>
+<text class="mono" x="28" y="608">factors.yaml</text>
+<rect class="pill" x="26" y="618" width="152" height="18" rx="9"/>
+<text class="pt" x="102.0" y="631" text-anchor="middle">rates illustrative</text>
+<rect class="bx " x="568" y="548" width="160" height="64" rx="6"/>
+<text class="t1" x="580" y="570">Tariff engine · P10</text>
+<text class="t2" x="580" y="588">rules dated by order</text>
+<rect class="bx " x="800" y="548" width="156" height="64" rx="6"/>
+<text class="t1" x="812" y="570">Bill check · P10</text>
+<text class="t2" x="812" y="588">penalties, demand</text>
+<rect class="bx " x="1030" y="548" width="160" height="64" rx="6"/>
+<text class="t1" x="1042" y="570">Scheduler · P12</text>
+<text class="t2" x="1042" y="588">CP-SAT, 96 slots</text>
+<polyline class="ar" points="188,580 566,580" marker-end="url(#ah)"/>
+<text class="al" x="200" y="574" text-anchor="start">tariff rules, ToD bands</text>
+<polyline class="ar" points="648,500 648,546" marker-end="url(#ah)"/>
+<text class="al" x="654" y="528" text-anchor="start">bills, load</text>
+<polyline class="ar" points="728,580 798,580" marker-end="url(#ah)"/>
+<text class="al" x="734" y="574" text-anchor="start">reprices</text>
+<polyline class="ar" points="648,612 648,636 1110,636 1110,614" marker-end="url(#ah)"/>
+<text class="al" x="995" y="652" text-anchor="middle">₹ per slot</text>
+<polyline class="ar" points="878,548 878,414" marker-end="url(#ah)"/>
+<text class="al" x="884" y="486" text-anchor="start">₹ penalties</text>
+<polyline class="ar" points="1110,548 1110,414" marker-end="url(#ah)"/>
+<text class="al" x="1116" y="486" text-anchor="start">₹ shift</text>
+<rect class="bx " x="1218" y="60" width="136" height="64" rx="6"/>
+<text class="t1" x="1230" y="82">Banker · auditor</text>
+<text class="t2" x="1230" y="100">savings report</text>
+<rect class="bx " x="1218" y="152" width="136" height="64" rx="6"/>
+<text class="t1" x="1230" y="174">EU buyer</text>
+<text class="t2" x="1230" y="192">emissions statement</text>
+<rect class="bx " x="1218" y="348" width="136" height="64" rx="6"/>
+<text class="t1" x="1230" y="370">Owner</text>
+<text class="t2" x="1230" y="388">dashboard, message</text>
+<rect class="bx plan" x="1218" y="444" width="136" height="64" rx="6"/>
+<text class="t1" x="1230" y="466">Chat bot · P18</text>
+<text class="t2" x="1230" y="484">WhatsApp, Telegram</text>
+<rect class="bx " x="1218" y="548" width="136" height="64" rx="6"/>
+<text class="t1" x="1230" y="570">Supervisor</text>
+<text class="t2" x="1230" y="588">shift plan</text>
+<polyline class="ar" points="1190,92 1216,92" marker-end="url(#ah)"/>
+<polyline class="ar" points="1190,184 1216,184" marker-end="url(#ah)"/>
+<polyline class="ar" points="1190,380 1216,380" marker-end="url(#ah)"/>
+<polyline class="ar" points="1190,580 1216,580" marker-end="url(#ah)"/>
+<polyline class="ar plan" points="1190,400 1204,400 1204,476 1216,476" marker-end="url(#ahd)"/>
+<rect class="bx plan" x="568" y="664" width="160" height="56" rx="6"/>
+<text class="t1" x="580" y="686">API + PostgreSQL</text>
+<text class="t2" x="580" y="704">replaces in-memory run</text>
+<polyline class="ar" points="342,500 342,746" marker-end="url(#ah)"/>
+<text class="al" x="348" y="700" text-anchor="start">SHA-256 on arrival</text>
+<rect class="bx audit" x="16" y="748" width="1338" height="56" rx="6"/>
+<text class="t1" x="28" y="771">Audit trail · P17</text>
+<text class="t2" x="28" y="790">Every input file hashed (SHA-256) and chained in an append-only log · consent recorded before sharing (P19) · every report prints the hashes</text>
+<rect class="bx" x="16" y="822" width="28" height="16" rx="3"/>
+<text class="al" x="52" y="834">working, tested</text>
+<rect class="pill" x="160" y="822" width="28" height="16" rx="8"/>
+<text class="al" x="196" y="834">built, but not live-tested or using placeholder values</text>
+<rect class="bx plan" x="508" y="822" width="28" height="16" rx="3"/>
+<text class="al" x="544" y="834">planned, not built</text>
+<rect class="bx ledger" x="672" y="822" width="28" height="16" rx="3"/>
+<text class="al" x="708" y="834">the single table every module reads</text>
+</svg>

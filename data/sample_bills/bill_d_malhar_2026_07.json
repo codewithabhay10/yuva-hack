@@ -1,0 +1,39 @@
+{
+  "consumer_number": "0331-HT-04712",
+  "discom": "Malhar Power Distribution Limited",
+  "tariff_category": "HT-IP (INDUSTRIAL POWER)",
+  "period_start": "2026-07-01",
+  "period_end": "2026-07-31",
+  "energy_basis": "kVAh",
+  "kwh_total": 146880.0,
+  "kvah_total": 152160.0,
+  "zones": [
+    {
+      "zone": "peak",
+      "units": 22840.0,
+      "charges": 194596.8
+    },
+    {
+      "zone": "normal",
+      "units": 79630.0,
+      "charges": 565373.0
+    },
+    {
+      "zone": "night",
+      "units": 49690.0,
+      "charges": 298140.0
+    }
+  ],
+  "max_demand_kva": 362.4,
+  "contract_demand_kva": 500.0,
+  "billing_demand_kva": 425.0,
+  "power_factor": 0.965,
+  "energy_charges": 1058109.8,
+  "demand_charges": 201875.0,
+  "excess_demand_charges": 0.0,
+  "pf_adjustment": 0.0,
+  "fixed_charges": 1500.0,
+  "electricity_duty": 42324.39,
+  "other_charges": -0.19,
+  "total_amount": 1303809.0
+}

@@ -35,7 +35,7 @@ streamlit run app.py              # the dashboard, including a WhatsApp bot simu
 python -m unitwatt                # the same pipeline from the command line; writes reports to data/generated/
 python -m unitwatt.bot chat       # chat with the bot in the terminal, as the owner, supervisor or accountant
 uvicorn unitwatt.server:app       # the WhatsApp webhook and REST API (see "The WhatsApp bot")
-pytest                            # 97 tests
+pytest                            # 104 tests
 python -m unitwatt.extract_eval   # score bill reading against the sample bills, field by field
 ```
 
@@ -60,16 +60,23 @@ names change often: if a preset model is retired, set `UNITWATT_MODEL`.
 Whatever the reader, every bill goes through the arithmetic checks and a confirmation screen
 before it reaches the ledger.
 
-**Tested:** the offline reader read all 21 specimen bills correctly: six months of the demo
-bill, each as a PDF, a clean scan and a phone photo, plus a second layout. The photos include
-angled, noisy, low-resolution and sideways shots. Every number on every bill was exact, and the
-only misreads were spaces and an I/1 in the printed tariff-category text. The online readers are
+**Tested:** the offline reader read 27 test bills correctly. They are six months of the demo
+bill, each as a PDF, a clean scan and a phone photo, plus four more layouts as a PDF and a photo:
+- a kVAh bill with a PF rebate
+- a dense state-utility bill with meter readings, excess demand and a fuel cost adjustment
+- a monospace computer printout
+- a Hindi and English bill
+
+The photos include angled, noisy, low-resolution and sideways shots. Every number on every bill
+was exact. The only misreads were spaces and an I/1 in the printed tariff-category text. The online readers are
 tested against a local stand-in for the API (request format, the JSON retry, rate-limit and key
 errors), but have not yet been run against Gemini itself. To do that, set `GEMINI_API_KEY` and
 run `python -m unitwatt.extract_eval --reader gemini`.
 
-`data/sample_bills/` has the specimen bills and the ground-truth JSON for each. They are
-fictional and watermarked, not real factory data.
+`data/sample_bills/` has the test bills and the ground-truth JSON for each. Every utility,
+name and number on them is made up, so they are not real factory data. The first two layouts
+carry a SPECIMEN watermark. The three newer ones have only a small test-bill footer, so they
+look like real bills.
 
 ## The WhatsApp bot
 

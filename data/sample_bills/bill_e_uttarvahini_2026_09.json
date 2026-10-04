@@ -1,0 +1,39 @@
+{
+  "consumer_number": "2209447103",
+  "discom": "Uttarvahini Vidyut Vitran Nigam Limited",
+  "tariff_category": "HV-1 (Industrial)",
+  "period_start": "2026-09-01",
+  "period_end": "2026-09-30",
+  "energy_basis": "kWh",
+  "kwh_total": 52436.0,
+  "kvah_total": 57496.0,
+  "zones": [
+    {
+      "zone": "solar",
+      "units": 24118.0,
+      "charges": 119625.28
+    },
+    {
+      "zone": "peak",
+      "units": 11206.0,
+      "charges": 83372.64
+    },
+    {
+      "zone": "normal",
+      "units": 17112.0,
+      "charges": 106094.4
+    }
+  ],
+  "max_demand_kva": 188.4,
+  "contract_demand_kva": 200.0,
+  "billing_demand_kva": 188.4,
+  "power_factor": 0.912,
+  "energy_charges": 309092.32,
+  "demand_charges": 65940.0,
+  "excess_demand_charges": 0.0,
+  "pf_adjustment": 0.0,
+  "fixed_charges": 300.0,
+  "electricity_duty": 15454.62,
+  "other_charges": 11127.32,
+  "total_amount": 401914.26
+}

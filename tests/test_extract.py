@@ -1,5 +1,6 @@
 import json
 import threading
+from datetime import date
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
@@ -39,6 +40,7 @@ def test_numbers_skip_dates_times_codes_percentages_and_rates():
     assert numbers("Demand charges on 187.5 kVA @ Rs 400 1,10,430.00", money=True) == [110430.0]
     assert numbers("4.70.724.00") == [470724.0]  # OCR read the lakh commas as points
     assert numbers("PF rebate -3,702.96") == [-3702.96]
+    assert numbers("DUEDATE:13,03,809.00") == [1303809.0]  # OCR dropped the space after the colon
 
 
 @pytest.mark.parametrize("path", [p for p in sample_files() if p.suffix == ".pdf"], ids=lambda p: p.name)
@@ -79,6 +81,20 @@ def test_offline_reader_flags_what_it_cannot_find():
     assert [(i.severity, i.field) for i in issues] == [("error", "demand_charges")]
     with pytest.raises(ExtractionError, match="Could not find enough bill fields"):
         parse_bill(_page([("Net amount payable", "9,000.00"), ("Energy charges", "8,000.00")]))
+
+
+def test_offline_reader_handles_ocr_slips_and_extra_line_items():
+    bill, issues = parse_bill(_page([
+        ("PERI0D", "01-07-2026 T031-07-2026"), ("Units consumed", "1,000"), ("Maximum demand", "50 kVA"),
+        ("C0NTRACT DEMAND", ": 60 kVA"), ("Energy charges", "8,000.00"), ("Demand charges", "900.00"),
+        ("Fuel surcharge (FPPAS @ 3.6%)", "288.00"), ("Net amount payable", "9,188.00"),
+    ]))
+    assert (bill.period_start, bill.period_end) == (date(2026, 7, 1), date(2026, 7, 31))  # O read as zero
+    assert bill.contract_demand_kva == 60 and bill.other_charges == 288.0 and issues == []
+    bill, _ = parse_bill(_page([("Billing period", "01-06-2026 to 30-06-2026"), ("Units consumed", "1,000"),
+                                ("Maximum demand", "50"), ("Contract demand", "60"), ("Energy charges", "8,000.00"),
+                                ("Demand charges", "900.00"), ("ROUND OFF", "-0.40"), ("Net bill amount", "8,899.60")]))
+    assert bill.other_charges == -0.40
 
 
 # --- Free vision model behind an OpenAI-compatible API ----------------------------------------

@@ -1,0 +1,39 @@
+{
+  "consumer_number": "471209883015",
+  "discom": "Sindhuvan Electricity Distribution Corporation Limited",
+  "tariff_category": "HT-2 (Industrial)",
+  "period_start": "2026-08-01",
+  "period_end": "2026-08-31",
+  "energy_basis": "kWh",
+  "kwh_total": 38640.0,
+  "kvah_total": 45890.0,
+  "zones": [
+    {
+      "zone": "off-peak",
+      "units": 11420.0,
+      "charges": 67949.0
+    },
+    {
+      "zone": "normal",
+      "units": 19860.0,
+      "charges": 138027.0
+    },
+    {
+      "zone": "peak",
+      "units": 7360.0,
+      "charges": 61382.4
+    }
+  ],
+  "max_demand_kva": 171.2,
+  "contract_demand_kva": 150.0,
+  "billing_demand_kva": 171.2,
+  "power_factor": 0.842,
+  "energy_charges": 267358.4,
+  "demand_charges": 57000.0,
+  "excess_demand_charges": 16112.0,
+  "pf_adjustment": 13367.92,
+  "fixed_charges": 750.0,
+  "electricity_duty": 20979.24,
+  "other_charges": 12364.8,
+  "total_amount": 387932.36
+}

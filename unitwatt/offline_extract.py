@@ -32,7 +32,9 @@ FIELD_LABELS: dict[str, list[str]] = {
     "pf_incentive": [r"powerfactorrebate", r"pfrebate", r"powerfactorincentive", r"pfincentive"],
     "fixed_charges": [r"fixed/meterrent", r"meterrent", r"fixedcharges?(?!.*demand)", r"servicecharges?"],
     "electricity_duty": [r"electricityduty", r"elecduty", r"electricitytax", r"ed(?=@|\(|$)"],
-    "other_charges": [r"othercharges", r"arrears", r"miscellaneous"],
+    "other_charges": [r"othercharges", r"fppca", r"fppas", r"fppcs", r"fuel(?:andpower)?(?:purchase)?(?:cost)?"
+                      r"(?:adjustment|adj|surcharge|charges?)", r"fac(?=\(|$)", r"round(?:ing|ed)?off", r"rounding",
+                      r"arrears", r"miscellaneous"],
     "max_demand_kva": [r"recordedmd", r"recorded(?:maximum|max)demand", r"maximumdemand", r"maxdemand", r"actualmd",
                        r"md\(kva\)"],
     "contract_demand_kva": [r"contractdemand", r"contracteddemand", r"sanctioneddemand", r"cd\(kva\)"],
@@ -66,6 +68,7 @@ ROW_LAST = {"kwh_total", "kvah_total", "max_demand_kva"}
 REQUIRED = ["period", "kwh_total", "max_demand_kva", "contract_demand_kva", "energy_charges", "demand_charges", "total_amount"]
 
 _ITEM_NUMBER = r"^(?:\d{1,2}(?=[a-z]))?"
+_SERIAL = re.compile(r"^\s*\(?\d{1,2}[.)]?\s*$")
 _PLAIN_NUMBER = re.compile(r"^\s*(?:rs\.?|₹)?\s*-?[\d,.]+\s*$", re.IGNORECASE)
 _DATE = re.compile(r"(\d{1,2})[-/.](\d{1,2}|[A-Za-z]{3,9})[-/.](\d{4}|\d{2})(?!\d)")
 _MONTH_YEAR = re.compile(r"([A-Za-z]{3,9})[-/ ']*(\d{4}|\d{2})(?!\d)|(\d{1,2})[-/](\d{4})(?!\d)")
@@ -206,6 +209,10 @@ def _norm(text: str) -> tuple[str, list[int]]:
         if (ch.isascii() and ch.isalnum()) or ch in "()%@/":
             kept.append(ch)
             index.append(i)
+    # OCR reads the letter O as a zero inside words: "PERI0D", "L0AD".
+    for k in range(1, len(kept) - 1):
+        if kept[k] == "0" and kept[k - 1].isalpha() and kept[k + 1].isalpha():
+            kept[k] = "o"
     return "".join(kept), index
 
 
@@ -298,7 +305,7 @@ class _Layout:
     def rest(ref: _Ref, end: int, raw: bool = False) -> str:
         """What follows the label inside its own cell."""
         rest = ref.cell.text[ref.index[end - 1] + 1:] if end else ref.cell.text
-        return rest.strip(" :/-–=|") if raw else _clean(rest)
+        return rest.strip(" :：/-–=|") if raw else _clean(rest)
 
     def following(self, ref: _Ref) -> list[_Ref]:
         """Cells level with ``ref`` and to its right, up to the next label."""
@@ -307,6 +314,10 @@ class _Layout:
         cells = []
         for other in row:
             if other.owner:
+                # A serial number just left of the next label is that row's "S.No.", not a value of this one.
+                if cells and _SERIAL.match(cells[-1].cell.text) and len(cells) > 1 \
+                        and other.cell.x0 - cells[-1].cell.x1 < cells[-1].cell.x0 - cells[-2].cell.x1:
+                    cells.pop()
                 break
             cells.append(other)
         return cells
@@ -380,8 +391,8 @@ def numbers(text: str, money: bool = False) -> list[float]:
         after = text[end: end + 2]
         if before.isalpha() and before not in "₹":
             continue  # part of an identifier such as HTM7718203
-        if before in "-/:–" and before2.isalnum():
-            continue  # second part of a date, time or code
+        if (before in "-/–" and before2.isalnum()) or (before == ":" and before2.isdigit()):
+            continue  # second part of a date, time or code ("Date:13,03,809.00" is a label and its value)
         if after[:1] in "-/:–" and after[1:2].isdigit():
             continue  # first part of a date, time or range
         if text[end:].lstrip().startswith("%"):
@@ -454,8 +465,8 @@ class _Parser:
             rest, cells = layout.rest(ref, end, raw=True), layout.following(ref)
             if re.search(r"[A-Za-z0-9]", rest):
                 return " ".join([rest] + [c.cell.text for c in cells]).strip()
-            if cells:
-                return " ".join([layout.wrapped(cells[0])] + [c.cell.text for c in cells[1:]]).strip()
+            if cells:  # a printout puts the colon in the value's cell: "TARIFF    : HT-IP"
+                return " ".join([layout.wrapped(cells[0])] + [c.cell.text for c in cells[1:]]).strip().lstrip(":：=|–- ")
             _, below = layout.texts_for(ref, end, raw=True)
             for text in below:
                 if re.search(r"[A-Za-z0-9]", text):
